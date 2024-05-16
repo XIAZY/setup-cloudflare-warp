@@ -30932,6 +30932,7 @@ async function installLinuxClient(version) {
 }
 
 async function installMacOSClient(version) {
+  await exec.exec("brew update");
   if (version === "") {
     await exec.exec("brew install --cask cloudflare-warp");
   } else {
@@ -31063,6 +31064,8 @@ async function run() {
   await (0,backoff.backOff)(() => checkWARPRegistration(organization, true), {
     numOfAttempts: 20,
   });
+  await exec.exec("warp-cli", ["--accept-tos", "set-mode", "proxy"]);
+  await exec.exec("warp-cli", ["--accept-tos", "set-proxy-port", "4000"]);
   await exec.exec("warp-cli", ["--accept-tos", "connect"]);
   await (0,backoff.backOff)(() => checkWARPConnected(), { numOfAttempts: 20 });
   core.saveState("connected", "true");
